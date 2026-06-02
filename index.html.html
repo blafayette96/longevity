@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Train">
+<meta name="theme-color" content="#0a0a0a">
+<title>Train</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--sur:#141414;--sur2:#1c1c1c;--bdr:rgba(255,255,255,0.08);--tx:#f0ede6;--mu:#6b6860;--ride:#a78bfa;--roll:#f0a060;--run:#c8f060;--rp:#60c8f0;--left:#f06090;--r:12px;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Mono',monospace;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100%;padding-top:var(--sat)}
+#topbar{padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);flex-shrink:0}
+#tbtitle{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.upd{font-size:10px;color:var(--mu);letter-spacing:.06em}
+#nav{display:flex;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.nt{flex:1;padding:11px 8px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.nt.on{color:var(--tx);border-bottom-color:var(--tx)}
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(24px + var(--sab))}
+.panel{display:none}.panel.on{display:block}
+.rhdr{margin:14px;padding:16px;background:var(--sur);border-radius:var(--r);border:1px solid var(--bdr)}
+.rtitle{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:10px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rm{font-size:10px;color:var(--mu);letter-spacing:.06em}
+.rm b{display:block;font-size:12px;font-weight:500;color:var(--tx);margin-top:2px}
+.sdiv{padding:18px 14px 6px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.02em}
+.wk{margin:0 14px 8px;border-radius:var(--r);border:1px solid var(--bdr);overflow:hidden}
+.wk.cur{border-color:var(--ride)}
+.wh{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--sur);cursor:pointer;user-select:none}
+.wl .wlab{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.wl .wdat{font-size:10px;color:var(--mu);margin-top:1px}
+.badge{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:500}
+.bc{background:rgba(167,139,250,.15);color:var(--ride)}
+.bd{background:rgba(255,255,255,.05);color:var(--mu)}
+.bt{background:rgba(240,160,96,.15);color:var(--roll)}
+.bp{background:rgba(200,240,96,.15);color:var(--run)}
+.br{background:rgba(96,200,240,.15);color:var(--rp)}
+.wb{display:none;padding:12px 14px;border-top:1px solid var(--bdr);background:var(--bg)}
+.wb.open{display:block}
+.sr{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bdr);align-items:baseline}
+.sr:last-child{border-bottom:none}
+.sd{color:var(--mu);min-width:34px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding-top:1px;flex-shrink:0}
+.sv{color:var(--tx);font-size:12px;line-height:1.5;flex:1}
+.dev{margin-top:10px;padding:10px 12px;background:var(--sur2);border-radius:8px;border-left:2px solid var(--roll)}
+.devt{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--roll);margin-bottom:5px}
+.devl{font-size:11px;color:var(--mu);line-height:1.7}
+.prin{margin:0 14px 8px;padding:12px 14px;background:var(--sur);border-radius:var(--r);border:1px solid var(--bdr);cursor:pointer}
+.ptit{font-size:12px;font-weight:500;color:var(--tx);display:flex;justify-content:space-between;align-items:center}
+.pbod{font-size:11px;color:var(--mu);line-height:1.7;margin-top:8px;display:none}
+.prin.open .pbod{display:block}
+.pch{font-size:9px;color:var(--mu);transition:transform .2s;flex-shrink:0}
+.prin.open .pch{transform:rotate(180deg)}
+.stabs{display:flex;gap:6px;padding:14px 14px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.stabs::-webkit-scrollbar{display:none}
+.stab{padding:6px 13px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;border:1px solid var(--bdr);background:none;color:var(--mu);white-space:nowrap;font-family:'DM Mono',monospace;transition:all .2s}
+.stab.or{background:rgba(167,139,250,.15);color:var(--ride);border-color:var(--ride)}
+.stab.ol{background:rgba(240,160,96,.15);color:var(--roll);border-color:var(--roll)}
+.stab.on{background:rgba(200,240,96,.15);color:var(--run);border-color:var(--run)}
+.stab.op{background:rgba(96,200,240,.15);color:var(--rp);border-color:var(--rp)}
+.tim{margin:10px 14px 0;padding:9px 12px;background:var(--sur);border-radius:8px;font-size:11px;color:var(--mu);border:1px solid var(--bdr);line-height:1.6}
+.plab{padding:14px 14px 5px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.ex{margin:0 14px 5px;border-radius:10px;background:var(--sur);border:1px solid var(--bdr);overflow:hidden}
+.exh{padding:11px 12px;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.exn{font-size:10px;color:var(--mu);min-width:18px;flex-shrink:0}
+.exi{flex:1}
+.exnm{font-size:12px;font-weight:500;color:var(--tx);line-height:1.4}
+.extags{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
+.tag{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:500}
+.tr{background:rgba(167,139,250,.15);color:var(--ride)}
+.tl{background:rgba(240,160,96,.15);color:var(--roll)}
+.tn{background:rgba(200,240,96,.15);color:var(--run)}
+.tp{background:rgba(96,200,240,.15);color:var(--rp)}
+.tleft{background:rgba(240,96,144,.15);color:var(--left)}
+.ech{font-size:9px;color:var(--mu);transition:transform .2s;flex-shrink:0}
+.ex.open .ech{transform:rotate(180deg)}
+.excues{display:none;padding:0 12px 11px;font-size:11px;color:var(--mu);line-height:1.75;border-top:1px solid var(--bdr)}
+.ex.open .excues{display:block}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="topbar"><div id="tbtitle">Train · Blake</div><div class="upd">Jun 1 2026</div></div>
+<div id="nav">
+<button class="nt on" onclick="nav('century',0)">Century</button>
+<button class="nt" onclick="nav('mobility',1)">Mobility</button>
+</div>
+<div id="content">
+<div id="p-century" class="panel on">
+<div class="rhdr">
+<div class="rtitle">Marin Century</div>
+<div class="rgrid">
+<div class="rm">Race day<b>Aug 1, 2026</b></div>
+<div class="rm">Start<b>7:00am · Novato</b></div>
+<div class="rm">Distance<b>102 mi · 6,670 ft</b></div>
+<div class="rm">Z2 target<b>~170W Wed · 165-170W Thu</b></div>
+</div>
+</div>
+<div class="sdiv">Schedule</div>
+<div class="wk" id="wk0"><div class="wh" onclick="twk(0)"><div class="wl"><div class="wlab">W1</div><div class="wdat">May 23</div></div><span class="badge bd">Done</span></div>
+<div class="wb" id="wb0">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Paradise &amp; Ocean Beach · 51 mi · 2,643 ft</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">55 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">55 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">5 mi easy</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 4 scoops · B2: LMNT + water · 2 sleeves Clif Bloks · ~100-125g total</span></div>
+<div class="dev"><div class="devt">Post-ride · May 23</div>
+<div class="devl">51.03 mi · 2,851 ft · 3:51 elapsed · HR avg 156 · cadence avg 92 · very windy</div>
+<div class="devl">HR high — wind-driven · Lower back fatigue last ~10 mi — not structural</div>
+<div class="devl">Hamstring tightness in final miles — glute compensation pattern</div>
+<div class="devl">Nutrition on target · Cadence solid at 92 rpm</div>
+</div></div></div>
+<div class="wk" id="wk1"><div class="wh" onclick="twk(1)"><div class="wl"><div class="wlab">W2</div><div class="wdat">May 31 (Travel)</div></div><span class="badge bd">Done</span></div>
+<div class="wb" id="wb1">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Paradise &amp; Hawk · 44 mi · 2,449 ft · 3 hr max</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">55 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">55 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">Skip — ride day</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 4 scoops · B2: LMNT + water · 2 sleeves · ~100-125g total</span></div>
+<div class="dev"><div class="devt">Week deviation · May 26-Jun 1</div>
+<div class="devl">Wed: Z2 trainer · 45 min @ 160-165W · Thu: Skipped</div>
+<div class="devl">Fri: Paradise ~40 mi · ~2,643 ft (stressor moved to Friday)</div>
+<div class="devl">Sat: ~4 mi easy run · Sun: ~60 min Z2 trainer</div>
+<div class="devl">Plan Saturday not completed. Resume W3 next week.</div>
+</div></div></div>
+<div class="wk cur" id="wk2"><div class="wh" onclick="twk(2)"><div class="wl"><div class="wlab">W3</div><div class="wdat">Jun 6 (Travel)</div></div><span class="badge bc">Current</span></div>
+<div class="wb open" id="wb2">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Paradise &amp; Hawk · 44 mi · 2,449 ft · 3 hr max</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">60 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">60 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">4-5 mi easy</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 4 scoops · B2: LMNT + water · 2 sleeves · ~100-125g total</span></div>
+<div class="dev"><div class="devt">Week deviation · Jun 2-Jun 8</div>
+<div class="devl">Thu: Rest — skipped Z2 to protect Friday ride</div>
+<div class="devl">Fri: Paradise &amp; Ocean Beach ~51 mi · ~2,851 ft (primary stressor)</div>
+<div class="devl">Sat: Easy trainer — 45-60 min Z1 · Sun: 4-5 mi easy run</div>
+<div class="devl">Saturday substituted with Friday outdoor ride. W3 volume preserved.</div>
+</div></div></div>
+<div class="wk" id="wk3"><div class="wh" onclick="twk(3)"><div class="wl"><div class="wlab">W4</div><div class="wdat">Jun 13</div></div></div>
+<div class="wb" id="wb3">
+<div class="sr"><span class="sd">Sat</span><span class="sv">TBD — longer moderate · ~55-60 mi · ~3,000-4,000 ft</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">60 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">55 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">4-5 mi easy</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 4-6 scoops · B2: LMNT · Refill: Skratch 4 scoops · 3-4 sleeves · ~175-200g total</span></div>
+</div></div>
+<div class="wk" id="wk4"><div class="wh" onclick="twk(4)"><div class="wl"><div class="wlab">W5</div><div class="wdat">Jun 20</div></div></div>
+<div class="wb" id="wb4">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Mt Tam, Seven Sisters &amp; Alpine Dam · 61 mi · 5,774 ft · first big elevation hit</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">65 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">60 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">4 mi easy</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 6 scoops · Refill: 4 scoops · 3-4 sleeves · ~200-225g total</span></div>
+</div></div>
+<div class="wk" id="wk5"><div class="wh" onclick="twk(5)"><div class="wl"><div class="wlab">W6</div><div class="wdat">Jun 28 (Travel)</div></div><span class="badge bt">Travel</span></div>
+<div class="wb" id="wb5">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Paradise &amp; Hawk · 44 mi · 2,449 ft · buy back volume on trainer</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">65 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">65 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">Skip — ride day</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 4 scoops · B2: LMNT + water · 2 sleeves · ~100-125g total</span></div>
+</div></div>
+<div class="wk" id="wk6"><div class="wh" onclick="twk(6)"><div class="wl"><div class="wlab">W7</div><div class="wdat">Jul 4</div></div></div>
+<div class="wb" id="wb6">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Mt Tam, Seven Sisters &amp; Alpine Dam · 61 mi · 5,774 ft · direct comparison to W5</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">60 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">50 min 160-165W (back off)</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">4 mi easy</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 6 scoops · Refill: 4 scoops · 3-4 sleeves · ~200-225g total</span></div>
+</div></div>
+<div class="wk" id="wk7"><div class="wh" onclick="twk(7)"><div class="wl"><div class="wlab">W8</div><div class="wdat">Jul 11</div></div><span class="badge bp">Peak</span></div>
+<div class="wb" id="wb7">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Mt Tam, Seven Sisters, Alpine Dam &amp; Paradise Loop · 78 mi · 6,342 ft</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">55 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">55 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">3 mi or skip</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">Full dress rehearsal · B1: 6 scoops · Refill x2: 6 scoops each · 4-5 sleeves · ~250-275g total</span></div>
+</div></div>
+<div class="wk" id="wk8"><div class="wh" onclick="twk(8)"><div class="wl"><div class="wlab">Cutback</div><div class="wdat">Jul 18</div></div></div>
+<div class="wb" id="wb8">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Paradise, Hawk &amp; Bunker · 50 mi · 3,471 ft</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">55 min ~170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">55 min 165-170W</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">4 mi easy</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1: Skratch 4 scoops · B2: LMNT + water · 2 sleeves · nothing heroic</span></div>
+</div></div>
+<div class="wk" id="wk9"><div class="wh" onclick="twk(9)"><div class="wl"><div class="wlab">Taper</div><div class="wdat">Jul 26</div></div></div>
+<div class="wb" id="wb9">
+<div class="sr"><span class="sd">Sat</span><span class="sv">Paradise &amp; Ocean Beach · 51 mi · 2,643 ft</span></div>
+<div class="sr"><span class="sd">Wed</span><span class="sv">45 min 165-170W</span></div>
+<div class="sr"><span class="sd">Thu</span><span class="sv">45 min 160-165W shakeout</span></div>
+<div class="sr"><span class="sd">Sun</span><span class="sv">3 mi easy</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">Normal protocol · legs fresh above all</span></div>
+</div></div>
+<div class="wk" id="wk10"><div class="wh" onclick="twk(10)"><div class="wl"><div class="wlab">Race</div><div class="wdat">Aug 1</div></div><span class="badge br">Race day</span></div>
+<div class="wb" id="wb10">
+<div class="sr"><span class="sd">Route</span><span class="sv">Marin Century · 102 mi · 6,670 ft · climbing back-loaded — pace conservatively miles 60-80</span></div>
+<div class="sr"><span class="sd">Fuel</span><span class="sv">B1 + 3 refills: Skratch 6 scoops each · 5-6 sleeves · ~350-375g total · 80-90g/hr · extra sleeve in reserve for late climb</span></div>
+</div></div>
+<div class="sdiv">Key principles</div>
+<div class="prin" onclick="this.classList.toggle('open')"><div class="ptit">Z2 wattage logic<span class="pch">v</span></div><div class="pbod">Wed primary — target ~170W. Thu sits 5-8W lower — conserve for Saturday. HR anchor: avg ~134, ceiling ~143 late. Drop watts if HR pushes 145+ before session ends. Z2 watts are trainer-only. Outdoor Strava watts are estimated.</div></div>
+<div class="prin" onclick="this.classList.toggle('open')"><div class="ptit">Outdoor HR vs power<span class="pch">v</span></div><div class="pbod">No power meter outdoors — Strava watts read low (~130s-140s avg) due to coasting. Use HR as the primary effort signal. Target avg HR less than 150 on long rides. Wind and elevation will naturally drive HR higher.</div></div>
+<div class="prin" onclick="this.classList.toggle('open')"><div class="ptit">Friday = sacred (W4-W8)<span class="pch">v</span></div><div class="pbod">Nothing on Friday. No rides, no strength, no quick spin. As Saturday mileage climbs to 61-78 mi, arriving fresh matters. Non-negotiable in Weeks 4-8.</div></div>
+<div class="prin" onclick="this.classList.toggle('open')"><div class="ptit">Travel weeks<span class="pch">v</span></div><div class="pbod">Weeks 2, 3, and 6 constrained to ~44 mi. Trainer sessions are the compensatory lever — prioritize hitting full duration on Wed + Thu those weeks. Week 6: longest trainer sessions of the build.</div></div>
+<div class="prin" onclick="this.classList.toggle('open')"><div class="ptit">Strength during build<span class="pch">v</span></div><div class="pbod">Keep Mon upper + Tue lower as-is. Do not progress loads aggressively in Weeks 4-8 — maintain, don't build.</div></div>
+<div class="prin" onclick="this.classList.toggle('open')"><div class="ptit">Week 8 dress rehearsal<span class="pch">v</span></div><div class="pbod">78 mi is the fitness test and race nutrition trial run. Full fuel protocol — Skratch 6 scoops per bottle, 4-5 sleeves Clif Bloks, target 60-90g carbs/hr (~250-275g total). Practice conservative pacing in miles 60-78. Report back to calibrate race day plan.</div></div>
+</div>
+<div id="p-mobility" class="panel">
+<div class="stabs">
+<button class="stab or" onclick="ss(this,'sat-pre','or')">Sat pre-ride</button>
+<button class="stab" onclick="ss(this,'sat-post','ol')">Sat post-ride</button>
+<button class="stab" onclick="ss(this,'sun-pre','on')">Sun pre-run</button>
+<button class="stab" onclick="ss(this,'sun-post','op')">Sun post-run</button>
+</div>
+<div id="mc"></div>
+</div>
+</div></div>
+<script>
+function nav(id,i){document.querySelectorAll('.nt').forEach((t,j)=>t.classList.toggle('on',j===i));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');if(id==='mobility'&&!window._mi){rm('sat-pre');window._mi=true;}}
+function twk(i){document.getElementById('wb'+i).classList.toggle('open');}
+const M={'sat-pre':{t:'~10 min · dynamic only · no static holds · immediately before rolling out',p:[{l:'Spine and posture',e:[{n:'01',nm:'Segmental cat-cow',tags:[['10 reps','tr']],c:'Hands and knees. Articulate segment by segment — tail to lumbar to thoracic to cervical up; reverse down. One vertebra at a time. 3-4 sec each direction. Exhale rounding up, inhale extending down.'},{n:'02',nm:'Thoracic rotation',tags:[['8x/side','tr']],c:'Seated or kneeling, hands behind head. Rotate upper body L/R, hips square. Rotate from mid-back, not neck. Pause 1 sec at end range each side.'}]},{l:'Hip flexor and glute',e:[{n:'03',nm:'Hip flexor mob — kneeling lunge + reach',tags:[['8x/side','tr'],['left first','tleft']],c:"Drop into kneeling lunge, drive hips forward, reach overhead with same-side arm. Dynamic — don't hold. Left side first. Posterior pelvic tilt at bottom."},{n:'04',nm:'Glute bridge — activation',tags:[['15 reps · 2-sec hold','tr']],c:'Lie on back, feet flat, drive hips up. Pause 2 sec at top. Non-negotiable as ride distances increase. Posterior pelvic tilt — squeeze glutes, not lower back. Feet hip-width, toes slightly out.'},{n:'05',nm:'Lateral band walk',tags:[['10 steps each direction','tr'],['left focus','tleft']],c:"Half-squat position, step laterally, maintain tension. Stay low. Toes forward, knees tracking over toes."},{n:'06',nm:'Leg swings — fwd/back + lateral',tags:[['10 each direction/side','tr'],['left first','tleft']],c:"Standard leg swings, forward/back then lateral. Left leg first. Pendulum motion. Standing leg slightly bent, pelvis still."},{n:'07',nm:'Ankle circles + single-leg calf raise',tags:[['10 circles + 8 raises/side','tr'],['left first','tleft']],c:'Slow ankle circles each direction, then controlled single-leg calf raises. Left side first. 2 sec up, 2 sec down. Slight knee bend to engage soleus.'}]}]},'sat-post':{t:'~12 min · within 5-10 min of finishing · left side priority',p:[{l:'Phase 1 — rolling (~6 min)',e:[{n:'',nm:'Left TFL / IT band',tags:[['60-90 sec','tl'],['left priority','tleft']],c:'Side-lying on roller, just below hip. Slow passes hip to just above knee. 2-3 sec/pass. Aim slightly anterior or posterior of IT band.'},{n:'',nm:'Left glute med',tags:[['60 sec','tl'],['left priority','tleft']],c:'Sit on roller, cross left ankle over right knee (figure-4), lean slightly left. Slow circular movements. Pause on tender spots.'},{n:'',nm:'Hamstring roll — both legs',tags:[['45 sec/side','tl'],['left first','tleft']],c:'Sit on roller, legs extended. Roll slowly from just below glute to back of knee. Left first, sitting slightly left to bias load. 3 sec/pass.'},{n:'',nm:'Left outer calf (peroneal)',tags:[['45 sec','tl'],['left priority','tleft']],c:'Sit with roller under left lower leg, slightly lateral. Slow passes from just below knee to above ankle. Rotate foot slightly inward.'},{n:'',nm:'Right TFL + right glute med',tags:[['30 sec each','tl']],c:'Maintenance only. Same technique as left side, shorter duration.'}]},{l:'Phase 2 — stretching (~6 min)',e:[{n:'',nm:'Hip flexor stretch — kneeling lunge',tags:[['60 sec L · 45 sec R','tr'],['left first','tleft']],c:"Rear knee on ground, drive hips forward. Left first — chronically tighter. Posterior pelvic tilt to deepen. Hold still, breathe slowly."},{n:'',nm:'Figure-4 glute stretch',tags:[['60 sec L · 45 sec R','tr'],['left first','tleft']],c:'Lie on back, cross left ankle over right knee. Pull right leg toward chest or press left knee away. Head down. Breathe.'},{n:'',nm:"Child's pose — lower back decompression",tags:[['60 sec','tr']],c:'Kneel, sit back toward heels, arms extended forward. Passive lumbar decompression. Forehead on floor. Breathe slowly.'},{n:'',nm:'Standing quad stretch',tags:[['40 sec/side','tr']],c:'Standard quad stretch. Wall for support if needed. Knees together, slight posterior pelvic tilt.'},{n:'',nm:'Calf stretch — gastroc + soleus',tags:[['30+30 sec/side','tr'],['left first','tleft']],c:'Two-position against wall. Straight leg = gastroc. Bent knee = soleus/Achilles. Left first. Heel flat, toes slightly inward for lateral calf.'}]}]},'sun-pre':{t:"5-7 min · dynamic only · legs pre-fatigued from Saturday · activate, don't stretch",p:[{l:'Activate',e:[{n:'',nm:'Leg swings — fwd/back',tags:[['10/side','tn'],['left first','tleft']],c:'Hold wall for balance. Controlled arc, pelvis still. Standing leg slightly bent.'},{n:'',nm:'Leg swings — lateral',tags:[['10/side','tn'],['left first','tleft']],c:"Face wall, swing leg side to side. Natural pendulum. Torso square."},{n:'',nm:'Hip circle (standing)',tags:[['8 each direction','tn'],['left first','tleft']],c:'Stand on one leg, draw slow circles with raised knee. Left first. Small to larger as you loosen. Wall for balance.'}]},{l:'Loosen',e:[{n:'',nm:'Walking lunge with hip opener',tags:[['6-8 steps/side','tn']],c:'Lunge forward, rear knee down. At bottom, rotate torso toward front leg, reach up. Pause 1 sec. Front knee tracks over second toe.'},{n:'',nm:'Ankle circles + calf raises',tags:[['10 circles + 10 raises/side','tn'],['left first','tleft']],c:'Slow ankle circles then BW single-leg calf raises. Slight knee bend, slow and controlled.'}]},{l:'Prime',e:[{n:'',nm:'High knees — cadence drill',tags:[['20 sec','tn']],c:'Short, quick steps in place with slight forward lean. Focus on quick feet, not height. Carry quick feet feeling into first mile.'}]}]},'sun-post':{t:'7-10 min · within 10 min of finishing · static + targeted',p:[{l:'Hip and glute',e:[{n:'',nm:'Figure-4 glute stretch',tags:[['60 sec L · 45 sec R','tp'],['left first','tleft']],c:"Cross ankle over opposite knee, sit back into hip. Left first — longer hold."},{n:'',nm:'Hip flexor stretch — kneeling lunge',tags:[['45 sec/side','tp']],c:"Rear knee down, drive hips forward. Posterior pelvic tilt. Don't arch lower back."}]},{l:'Hamstring and calf',e:[{n:'',nm:'Standing hamstring stretch',tags:[['40 sec/side','tp']],c:"Heel on low surface, hinge at hips toward extended leg. Hinge from hips. Feel stretch in belly of hamstring, not knee."},{n:'',nm:'Calf stretch — gastroc + soleus',tags:[['45+40 sec/side','tp'],['left first','tleft']],c:'Straight-leg then bent-knee against wall. Left first — longer hold. Heel flat, toes slightly inward. Sink hips slightly for bent-knee.'}]},{l:'Quad and IT band',e:[{n:'',nm:'Standing quad stretch',tags:[['40 sec/side','tp']],c:'Standard quad stretch. Knees together. Slight posterior pelvic tilt.'},{n:'',nm:'Cross-leg IT band / lateral hip stretch',tags:[['40 sec/side','tp'],['left first','tleft']],c:'Stand tall, cross left leg behind right, lean laterally right. Push left hip out while leaning right.'}]}]}};
+let cs='sat-pre';
+function rm(sid){cs=sid;const d=M[sid];let h='<div class="tim">'+d.t+'</div>';let n=1;d.p.forEach(ph=>{h+='<div class="plab">'+ph.l+'</div>';ph.e.forEach(e=>{const id='ex_'+sid+'_'+n;const tags=e.tags.map(t=>'<span class="tag '+t[1]+'">'+t[0]+'</span>').join('');h+='<div class="ex" id="'+id+'"><div class="exh" onclick="document.getElementById(\''+id+'\').classList.toggle(\'open\')"><span class="exn">'+(e.n||String(n).padStart(2,'0'))+'</span><div class="exi"><div class="exnm">'+e.nm+'</div><div class="extags">'+tags+'</div></div><span class="ech">v</span></div><div class="excues">'+e.c+'</div></div>';n++;});});document.getElementById('mc').innerHTML=h;}
+function ss(btn,sid,cls){document.querySelectorAll('.stab').forEach(b=>b.className='stab');btn.className='stab '+cls;rm(sid);}
+</script>
+</body>
+</html>
